@@ -1,4 +1,22 @@
-- name: Print Redis
-  debug:
-      msg: Redis
+- name: Install Redis Repos
+  ansible.builtin.yum:
+    name: https://rpms.remirepo.net/enterprise/remi-release-8.rpm
+    state: installed
+    disable_gpg_check: yes
 
+- name: Enable & Install Redis
+  ansible.builtin.dnf:
+    name: "@redis:remi-6.2"
+    state: installed
+
+- name: Update MongoDB Listen Address
+  ansible.builtin.replace:
+    path: /etc/redis.conf
+    regexp: '127.0.0.1 '
+    replace: '0.0.0.0'
+
+- name: Start MongoDB
+  ansible.builtin.systemd:
+    name: redis
+    state: started
+    enabled: true
